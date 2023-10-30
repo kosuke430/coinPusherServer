@@ -115,6 +115,19 @@ namespace CoinPusherServer.Controllers
             return NoContent();
         }
 
+        //コインのランキングを取得するAPI
+        [HttpGet("ranking")]
+        public async Task<ActionResult<IEnumerable<UserRanking>>> GetRanking()
+        {
+          if (_context.CoinUsers == null)
+          {
+              return NotFound();
+          }
+            var coinUsers = await _context.CoinUsers.ToListAsync();
+            var ranking = coinUsers.OrderByDescending(x => x.HaveCoin).Select(x => new UserRanking { Name = x.Name, HaveCoin = x.HaveCoin }).Take(5).ToList();
+            return ranking;
+        }
+
         private bool CoinUserExists(long id)
         {
             return (_context.CoinUsers?.Any(e => e.Id == id)).GetValueOrDefault();
